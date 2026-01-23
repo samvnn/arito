@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { createElement } from "react";
 
 // IonIcon component wrapper for TypeScript compatibility
@@ -14,7 +15,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
-              src="/arito-logo.svg"
+              src="/shared/arito-logo.svg"
               alt="Arito Logo"
               width={40}
               height={40}
@@ -24,9 +25,12 @@ export default function Home() {
               arito
             </span>
           </div>
-          <button className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors">
+          <Link 
+            href="/auth/login"
+            className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+          >
             Get Started
-          </button>
+          </Link>
         </div>
       </nav>
 
@@ -49,10 +53,13 @@ export default function Home() {
                 Arito helps students study smarter—not harder—by cutting unnecessary content, using trusted curriculum-aligned resources, and personalizing learning with AI.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors flex items-center gap-2">
+                <Link 
+                  href="/auth/signup"
+                  className="bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
+                >
                   Start Studying Smarter
                   <span>→</span>
-                </button>
+                </Link>
                 <button className="bg-white border-2 border-primary text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary hover:text-white transition-colors">
                   Watch Demo
                 </button>
@@ -76,7 +83,7 @@ export default function Home() {
             {/* Right Column - Image */}
             <div className="relative">
               <Image
-                src="/student-studying-laptop.jpg"
+                src="/landing/student-studying-laptop.jpg"
                 alt="Student studying with laptop"
                 width={600}
                 height={400}
@@ -143,7 +150,7 @@ export default function Home() {
 
           <div className="relative overflow-hidden rounded-xl h-64 md:h-80">
             <Image
-              src="/books.jpg"
+              src="/landing/books.jpg"
               alt="Books"
               width={1200}
               height={400}
@@ -241,10 +248,13 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <button className="bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors flex items-center gap-2 mx-auto">
+            <Link 
+              href="/auth/signup"
+              className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors"
+            >
               <IonIcon name="flash-outline" />
               <span>Try Arito Free</span>
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -291,7 +301,7 @@ export default function Home() {
             </div>
             <div className="bg-background rounded-xl overflow-hidden">
               <Image
-                src="/library-of-resources.jpg"
+                src="/landing/library-of-resources.jpg"
                 alt="Library of educational resources"
                 width={600}
                 height={400}
@@ -304,7 +314,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-16 md:mb-20">
             <div className="bg-background rounded-xl overflow-hidden order-2 lg:order-1">
               <Image
-                src="/study-scheduler.jpg"
+                src="/landing/study-scheduler.jpg"
                 alt="AI Study Scheduler"
                 width={600}
                 height={400}
@@ -363,7 +373,7 @@ export default function Home() {
             </div>
             <div className="bg-background rounded-xl overflow-hidden h-[400px]">
               <Image
-                src="/brain-profile.jpg"
+                src="/landing/brain-profile.jpg"
                 alt="Happy student learning effectively"
                 width={600}
                 height={400}
@@ -376,7 +386,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="bg-background rounded-xl overflow-hidden order-2 lg:order-1 h-[400px]">
               <Image
-                src="/resource-scanning.jpg"
+                src="/landing/resource-scanning.jpg"
                 alt="Student scanning study materials"
                 width={600}
                 height={400}
@@ -493,9 +503,12 @@ export default function Home() {
               Join thousands of students who are saving time, reducing stress, and achieving better results with Arito's AI-powered study platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-background transition-colors">
+              <Link 
+                href="/auth/signup"
+                className="bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-background transition-colors"
+              >
                 Start Free Today
-              </button>
+              </Link>
               <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-primary transition-colors">
                 Schedule a Demo
               </button>
