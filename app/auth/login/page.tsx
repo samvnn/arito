@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import IonIcon from "../../components/IonIcon";
 import { createClient } from "@/lib/supabase/client";
@@ -10,16 +10,18 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
 
   useEffect(() => {
-    // Check for error query parameter from callback route
-    const errorParam = searchParams.get('error');
-    if (errorParam === 'auth_failed') {
-      setError("Authentication failed. Please try logging in again.");
+    // Read error from query string on client without using useSearchParams
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const errorParam = params.get("error");
+      if (errorParam === "auth_failed") {
+        setError("Authentication failed. Please try logging in again.");
+      }
     }
-  }, [searchParams]);
+  }, []);
 
   const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
