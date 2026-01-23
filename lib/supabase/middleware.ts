@@ -45,8 +45,8 @@ export async function updateSession(request: NextRequest) {
 
     const redirectResponse = NextResponse.redirect(url)
     // Copy over Supabase cookies to keep the session in sync
-    supabaseResponse.cookies.getAll().forEach(({ name, value, options }) => {
-      redirectResponse.cookies.set(name, value, options)
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie)
     })
 
     return redirectResponse
@@ -66,8 +66,8 @@ export async function updateSession(request: NextRequest) {
     url.pathname = '/auth/login'
     const redirectResponse = NextResponse.redirect(url)
     // Copy over Supabase cookies to keep the session in sync
-    supabaseResponse.cookies.getAll().forEach(({ name, value, options }) => {
-      redirectResponse.cookies.set(name, value, options)
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie)
     })
     return redirectResponse
   }
@@ -77,8 +77,8 @@ export async function updateSession(request: NextRequest) {
   // 1. Pass the request in it, like so:
   //    const myNewResponse = NextResponse.next({ request })
   // 2. Copy over the cookies, like so:
-  //    supabaseResponse.cookies.getAll().forEach(({ name, value, options }) =>
-  //      myNewResponse.cookies.set(name, value, options)
+  //    supabaseResponse.cookies.getAll().forEach((cookie) =>
+  //      myNewResponse.cookies.set(cookie)
   //    )
   // 3. Change the myNewResponse object to fit your needs, but avoid changing
   //    the cookies!
