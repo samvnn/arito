@@ -35,17 +35,41 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const pathname = request.nextUrl.pathname
+
+  // If the user is logged in and tries to access the public landing page,
+  // send them straight to their authenticated homepage.
+  if (user && (pathname === '/' || pathname === '/landing')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/homepage'
+
+    const redirectResponse = NextResponse.redirect(url)
+    // Copy over Supabase cookies to keep the session in sync
+    supabaseResponse.cookies.getAll().forEach(({ name, value, options }) => {
+      redirectResponse.cookies.set(name, value, options)
+    })
+
+    return redirectResponse
+  }
+
+  // If there is no user and the route is not an auth route or the public landing page,
+  // redirect to login.
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith('/auth/login') &&
-    !request.nextUrl.pathname.startsWith('/auth/signup') &&
-    !request.nextUrl.pathname.startsWith('/auth/callback') &&
-    request.nextUrl.pathname !== '/'
+    !pathname.startsWith('/auth/login') &&
+    !pathname.startsWith('/auth/signup') &&
+    !pathname.startsWith('/auth/callback') &&
+    pathname !== '/' &&
+    !pathname.startsWith('/homepage')
   ) {
-    // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    // Copy over Supabase cookies to keep the session in sync
+    supabaseResponse.cookies.getAll().forEach(({ name, value, options }) => {
+      redirectResponse.cookies.set(name, value, options)
+    })
+    return redirectResponse
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
@@ -53,7 +77,9 @@ export async function updateSession(request: NextRequest) {
   // 1. Pass the request in it, like so:
   //    const myNewResponse = NextResponse.next({ request })
   // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
+  //    supabaseResponse.cookies.getAll().forEach(({ name, value, options }) =>
+  //      myNewResponse.cookies.set(name, value, options)
+  //    )
   // 3. Change the myNewResponse object to fit your needs, but avoid changing
   //    the cookies!
   // 4. Finally:
