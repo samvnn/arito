@@ -19,7 +19,7 @@ export default function Navigation() {
           </span>
         </Link>
         <Link 
-          href="/auth/login"
+          href="/?auth=open"
           className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
         >
           Get Started

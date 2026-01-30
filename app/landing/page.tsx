@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { createElement } from "react";
+import { useRouter } from "next/navigation";
+import { createElement, useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 // IonIcon component wrapper for TypeScript compatibility
 function IonIcon({ name, ...props }: { name: string; [key: string]: any }) {
@@ -10,10 +12,93 @@ function IonIcon({ name, ...props }: { name: string; [key: string]: any }) {
 }
 
 export default function Home() {
+  const router = useRouter();
+  const [authOverlayOpen, setAuthOverlayOpen] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("auth") === "open") setAuthOverlayOpen(true);
+    if (params.get("error") === "auth_failed") setAuthError("Authentication failed. Please try again.");
+  }, []);
+
+  const openAuthOverlay = () => {
+    setAuthOverlayOpen(true);
+    setAuthError(null);
+    router.replace("/?auth=open", { scroll: false });
+  };
+
+  const closeAuthOverlay = () => {
+    setAuthOverlayOpen(false);
+    setAuthError(null);
+    router.replace("/", { scroll: false });
+  };
+
+  const handleGoogleAuth = async () => {
+    setAuthLoading(true);
+    setAuthError(null);
+    try {
+      const { error } = await createClient().auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (error) throw error;
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : "Sign in failed");
+      setAuthLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-background">
+      {/* Auth overlay */}
+      {authOverlayOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={closeAuthOverlay}
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          />
+          <div className="relative w-full max-w-md rounded-xl bg-surface shadow-xl p-8 md:p-10">
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={closeAuthOverlay}
+              className="absolute right-4 top-4 p-1 text-primary/70 hover:text-primary rounded"
+            >
+              <IonIcon name="close" style={{ fontSize: "1.5rem" }} />
+            </button>
+            <div className="text-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">
+                Welcome to Arito
+              </h2>
+              <p className="text-primary/70">
+                Sign in with Google to continue your learning journey
+              </p>
+            </div>
+            {authError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                {authError}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleGoogleAuth}
+              disabled={authLoading}
+              className="w-full border-2 border-primary/20 text-primary py-3 rounded-lg font-semibold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <IonIcon name="logo-google" style={{ fontSize: "1.5rem" }} />
+              <span>{authLoading ? "Signing in..." : "Continue with Google"}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="bg-white px-4 md:px-8 lg:px-16 py-4 sticky top-0 z-50">
+      <nav className="bg-surface px-4 md:px-8 lg:px-16 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
@@ -27,12 +112,13 @@ export default function Home() {
               arito
             </span>
           </div>
-          <Link 
-            href="/auth/login"
-            className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+          <button
+            type="button"
+            onClick={openAuthOverlay}
+            className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
           >
             Get Started
-          </Link>
+          </button>
         </div>
       </nav>
 
@@ -55,14 +141,15 @@ export default function Home() {
                 Arito helps students study smarter—not harder—by cutting unnecessary content, using trusted curriculum-aligned resources, and personalizing learning with AI.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  href="/auth/signup"
-                  className="bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
+                <button
+                  type="button"
+                  onClick={openAuthOverlay}
+                  className="bg-primary text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors flex items-center gap-2"
                 >
                   Start Studying Smarter
                   <span>→</span>
-                </Link>
-                <button className="bg-white border-2 border-primary text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary hover:text-white transition-colors">
+                </button>
+                <button className="bg-surface border-2 border-primary text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary hover:text-primary-foreground transition-colors">
                   Watch Demo
                 </button>
               </div>
@@ -97,10 +184,10 @@ export default function Home() {
       </section>
 
       {/* Problem Section */}
-      <section className="px-4 md:px-8 lg:px-16 py-12 md:py-20 bg-white">
+      <section className="px-4 md:px-8 lg:px-16 py-12 md:py-20 bg-surface">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
-            <div className="inline-flex items-center gap-2 bg-white border border-primary/20 text-primary px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-4">
+            <div className="inline-flex items-center gap-2 bg-surface border border-primary/20 text-primary px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide mb-4">
               <IonIcon name="alert-circle-outline" />
               <span>The Problem</span>
             </div>
@@ -113,9 +200,9 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12">
-            <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-primary/10 text-center">
-              <div className="text-4xl mb-4 flex justify-center">
-                <IonIcon name="albums-outline" style={{ fontSize: '3rem', color: 'var(--foreground)' }} />
+            <div className="bg-surface p-6 md:p-8 rounded-xl shadow-sm border border-primary/10 text-center">
+              <div className="text-4xl mb-4 flex justify-center text-foreground">
+                <IonIcon name="albums-outline" style={{ fontSize: '3rem' }} />
               </div>
               <h3 className="text-xl md:text-2xl font-bold text-primary mb-3">
                 Too Much Content
@@ -125,9 +212,9 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-primary/10 text-center">
-              <div className="text-4xl mb-4 flex justify-center">
-                <IonIcon name="trending-down-outline" style={{ fontSize: '3rem', color: 'var(--foreground)' }} />
+            <div className="bg-surface p-6 md:p-8 rounded-xl shadow-sm border border-primary/10 text-center">
+              <div className="text-4xl mb-4 flex justify-center text-foreground">
+                <IonIcon name="trending-down-outline" style={{ fontSize: '3rem' }} />
               </div>
               <h3 className="text-xl md:text-2xl font-bold text-primary mb-3">
                 Unreliable Resources
@@ -137,9 +224,9 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-primary/10 text-center">
-              <div className="text-4xl mb-4 flex justify-center">
-                <IonIcon name="trending-down-outline" style={{ fontSize: '3rem', color: 'var(--foreground)' }} />
+            <div className="bg-surface p-6 md:p-8 rounded-xl shadow-sm border border-primary/10 text-center">
+              <div className="text-4xl mb-4 flex justify-center text-foreground">
+                <IonIcon name="trending-down-outline" style={{ fontSize: '3rem' }} />
               </div>
               <h3 className="text-xl md:text-2xl font-bold text-primary mb-3">
                 Poor Time Management
@@ -176,7 +263,7 @@ export default function Home() {
       <section className="px-4 md:px-8 lg:px-16 py-12 md:py-20 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
-            <div className="inline-flex items-center gap-2 bg-white border border-primary/20 text-primary px-4 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide mb-4">
+            <div className="inline-flex items-center gap-2 bg-surface border border-primary/20 text-primary px-4 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide mb-4">
               <IonIcon name="flash-outline" />
               <span>Simple Process</span>
             </div>
@@ -228,8 +315,8 @@ export default function Home() {
                   <div className="bg-primary rounded-lg w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mb-4">
                     <IonIcon 
                       name={step.icon} 
-                      style={{ fontSize: '2rem', color: 'white' }} 
-                      className="text-white"
+                      style={{ fontSize: '2rem' }} 
+                      className="text-primary-foreground"
                     />
                   </div>
                   {/* Number */}
@@ -250,19 +337,20 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <Link 
-              href="/auth/signup"
-              className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors"
+            <button
+              type="button"
+              onClick={openAuthOverlay}
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-dark transition-colors"
             >
               <IonIcon name="flash-outline" />
               <span>Try Arito Free</span>
-            </Link>
+            </button>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="px-4 md:px-8 lg:px-16 py-12 md:py-20 bg-white">
+      <section className="px-4 md:px-8 lg:px-16 py-12 md:py-20 bg-surface">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 md:mb-16">
             <p className="text-sm md:text-base text-primary font-semibold uppercase tracking-wide mb-4">
@@ -279,8 +367,8 @@ export default function Home() {
           {/* Feature 1 - Library */}
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-16 md:mb-20">
             <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <IonIcon name="library-outline" style={{ fontSize: '2.5rem', color: 'var(--foreground)' }} />
+              <div className="flex items-center gap-3 mb-2 text-foreground">
+                <IonIcon name="library-outline" style={{ fontSize: '2.5rem' }} />
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary">
                 Trusted Curriculum Library
@@ -324,8 +412,8 @@ export default function Home() {
               />
             </div>
             <div className="space-y-6 order-1 lg:order-2">
-              <div className="flex items-center gap-3 mb-2">
-                <IonIcon name="calendar-outline" style={{ fontSize: '2.5rem', color: 'var(--foreground)' }} />
+              <div className="flex items-center gap-3 mb-2 text-foreground">
+                <IonIcon name="calendar-outline" style={{ fontSize: '2.5rem' }} />
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary">
                 AI-powered study scheduler
@@ -351,8 +439,8 @@ export default function Home() {
           {/* Feature 3 - Brain Profile */}
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-16 md:mb-20">
             <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-2">
-                <IonIcon name="person-outline" style={{ fontSize: '2.5rem', color: 'var(--foreground)' }} />
+              <div className="flex items-center gap-3 mb-2 text-foreground">
+                <IonIcon name="person-outline" style={{ fontSize: '2.5rem' }} />
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary">
                 Student Brain Profile
@@ -396,8 +484,8 @@ export default function Home() {
               />
             </div>
             <div className="space-y-6 order-1 lg:order-2">
-              <div className="flex items-center gap-3 mb-2">
-                <IonIcon name="scan-outline" style={{ fontSize: '2.5rem', color: 'var(--foreground)' }} />
+              <div className="flex items-center gap-3 mb-2 text-foreground">
+                <IonIcon name="scan-outline" style={{ fontSize: '2.5rem' }} />
               </div>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary">
                 Smart Resource Scanning
@@ -472,14 +560,15 @@ export default function Home() {
             ].map((benefit, index) => (
               <div
                 key={index}
-                className={`bg-white p-6 md:p-8 rounded-xl border border-primary/10 ${
+                className={`bg-surface p-6 md:p-8 rounded-xl border border-primary/10 ${
                   index % 3 === 1 ? "lg:bg-background" : ""
                 }`}
               >
                 <div className="bg-primary rounded-lg w-12 h-12 md:w-14 md:h-14 flex items-center justify-center mb-4">
                   <IonIcon 
                     name={benefit.icon} 
-                    style={{ fontSize: '1.75rem', color: 'white' }} 
+                    style={{ fontSize: '1.75rem' }} 
+                    className="text-primary-foreground"
                   />
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-primary mb-3">
@@ -495,27 +584,28 @@ export default function Home() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="px-4 md:px-8 lg:px-16 py-12 md:py-20 bg-primary text-white">
+      <section className="px-4 md:px-8 lg:px-16 py-12 md:py-20 bg-primary text-primary-foreground">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center text-center space-y-6">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
               Ready to Study Smarter, Not Harder?
             </h2>
-            <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl">
+            <p className="text-lg md:text-xl text-primary-foreground/90 leading-relaxed max-w-3xl">
               Join thousands of students who are saving time, reducing stress, and achieving better results with Arito's AI-powered study platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link 
-                href="/auth/signup"
-                className="bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-background transition-colors"
+              <button
+                type="button"
+                onClick={openAuthOverlay}
+                className="bg-surface text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-background transition-colors"
               >
                 Start Free Today
-              </Link>
-              <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-primary transition-colors">
+              </button>
+              <button className="border-2 border-primary-foreground text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg hover:bg-surface hover:text-primary transition-colors">
                 Schedule a Demo
               </button>
             </div>
-            <ul className="space-y-2 text-white/90">
+            <ul className="space-y-2 text-primary-foreground/90">
               <li className="flex items-center justify-center gap-2">
                 <span>✓</span>
                 <span>Free for 30 days—no credit card required</span>
@@ -534,13 +624,13 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="px-4 md:px-8 lg:px-16 py-12 md:py-16 bg-white border-t border-primary/10">
+      <footer className="px-4 md:px-8 lg:px-16 py-12 md:py-16 bg-surface border-t border-primary/10">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 mb-8">
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-4">
                 <Image
-                  src="/arito-logo.svg"
+                  src="/shared/arito-logo.svg"
                   alt="Arito Logo"
                   width={40}
                   height={40}
@@ -592,28 +682,28 @@ export default function Home() {
               <div className="flex gap-6">
                 <a 
                   href="#" 
-                  className="text-primary/70 transition-colors hover:[color:#E4405F]"
+                  className="text-primary/70 transition-colors hover:text-social-instagram"
                   aria-label="Instagram"
                 >
                   <IonIcon name="logo-instagram" style={{ fontSize: '1.5rem' }} />
                 </a>
                 <a 
                   href="#" 
-                  className="text-primary/70 transition-colors hover:[color:#FF0000]"
+                  className="text-primary/70 transition-colors hover:text-social-youtube"
                   aria-label="YouTube"
                 >
                   <IonIcon name="logo-youtube" style={{ fontSize: '1.5rem' }} />
                 </a>
                 <a 
                   href="#" 
-                  className="text-primary/70 transition-colors hover:[color:#1DA1F2]"
+                  className="text-primary/70 transition-colors hover:text-social-twitter"
                   aria-label="Twitter"
                 >
                   <IonIcon name="logo-twitter" style={{ fontSize: '1.5rem' }} />
                 </a>
                 <a 
                   href="#" 
-                  className="text-primary/70 transition-colors hover:[color:#0077B5]"
+                  className="text-primary/70 transition-colors hover:text-social-linkedin"
                   aria-label="LinkedIn"
                 >
                   <IonIcon name="logo-linkedin" style={{ fontSize: '1.5rem' }} />

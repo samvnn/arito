@@ -29,8 +29,9 @@ export async function GET(request: Request) {
     }
   }
 
-  // return the user to login page with error message
-  const url = new URL(`${origin}/auth/login`)
+  // return the user to landing with auth overlay open and error
+  const url = new URL(`${origin}/`)
+  url.searchParams.set('auth', 'open')
   url.searchParams.set('error', 'auth_failed')
   return NextResponse.redirect(url.toString())
 }

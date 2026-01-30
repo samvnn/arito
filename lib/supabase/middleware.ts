@@ -53,17 +53,17 @@ export async function updateSession(request: NextRequest) {
   }
 
   // If there is no user and the route is not an auth route or the public landing page,
-  // redirect to login.
+  // redirect to landing with auth overlay open.
   if (
     !user &&
-    !pathname.startsWith('/auth/login') &&
-    !pathname.startsWith('/auth/signup') &&
     !pathname.startsWith('/auth/callback') &&
     pathname !== '/' &&
+    !pathname.startsWith('/landing') &&
     !pathname.startsWith('/homepage')
   ) {
     const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
+    url.pathname = '/'
+    url.searchParams.set('auth', 'open')
     const redirectResponse = NextResponse.redirect(url)
     // Copy over Supabase cookies to keep the session in sync
     supabaseResponse.cookies.getAll().forEach((cookie) => {
