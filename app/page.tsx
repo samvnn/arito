@@ -68,9 +68,11 @@ export default function Home() {
               )}
             </button>
 
-            <span className="hidden items-center gap-1.5 rounded-3xl bg-white px-3 py-1.5 text-sm text-secondary md:flex">
-              Sign in
-              <ion-icon name="log-in-outline"></ion-icon>
+            <span className="hidden items-center gap-1.5 rounded-3xl border border-primary bg-transparent px-3 py-1.5 text-sm text-primary md:flex cursor-pointer hover:bg-primary/10 transition-colors">
+              Login
+            </span>
+            <span className="hidden items-center gap-1.5 rounded-3xl bg-primary px-3 py-1.5 text-sm text-secondary md:flex">
+              Start now
             </span>
           </nav>
         </div>  
