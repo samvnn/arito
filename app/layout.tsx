@@ -3,8 +3,22 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Arito - Study Smarter, Not Harder",
-  description: "Arito helps students study smarter—not harder—by cutting unnecessary content, using trusted curriculum-aligned resources, and personalizing learning with AI.",
+  title: "Arito",
+  description: "Learn how you learn",
+  openGraph: {
+    title: "Arito",
+    description: "Learn how you learn",
+    url: "https://arito.vercel.app",
+    images: [
+      {
+        url: "/arito-logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Arito preview",
+      },
+    ],
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -16,14 +30,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Script
-          type="module"
           src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
           strategy="afterInteractive"
-        />
-        <Script
-          noModule
-          src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
-          strategy="afterInteractive"
+          type="module"
         />
         {children}
       </body>

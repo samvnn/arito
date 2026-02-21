@@ -1,84 +1,24 @@
 @import "tailwindcss";
 
-/*
-  QUICK CUSTOMIZATION
-  Edit only the :root block below. Change hex/rgba values to update colors
-  across the app. Names are self-explanatory (e.g. --primary = main brand color).
-*/
-
-/* ==========================================================================
-   DESIGN TOKENS – Change these values to customize the whole app
-   ========================================================================== */
-
-:root {
-  /* ---- Page & layout ---- */
-  --background: #f8f8f8;
-  --foreground: #375A50;
-
-  /* ---- Brand (primary color = main green) ---- */
-  --primary: #375A50;
-  --primary-dark: #2a453d;
-  --primary-foreground: #ffffff; /* text/icon on primary bg */
-  --primary-muted: rgba(55, 90, 80, 0.8);   /* body text */
-  --primary-subtle: rgba(55, 90, 80, 0.7); /* captions, stats */
-  --primary-border: rgba(55, 90, 80, 0.2);
-  --primary-border-subtle: rgba(55, 90, 80, 0.1);
-
-  /* ---- Surfaces (cards, nav, sections) ---- */
-  --surface: #ffffff;
-  --surface-alt: #fffbf4;   /* warm off-white for variety */
-  --surface-overlay: rgba(0, 0, 0, 0.4);   /* image overlays */
-
-  /* ---- Accent (optional highlight, badges) ---- */
-  --accent: #fcf9f3;
-  --accent-foreground: #375A50;
-
-  /* ---- CTA section (full-width primary block) ---- */
-  --cta-bg: var(--primary);
-  --cta-foreground: #ffffff;
-  --cta-foreground-muted: rgba(255, 255, 255, 0.9);
-  --cta-button-bg: #ffffff;
-  --cta-button-fg: var(--primary);
-  --cta-button-hover-bg: var(--background);
-
-  /* ---- Footer ---- */
-  --footer-bg: var(--surface);
-  --footer-border: var(--primary-border-subtle);
-  --footer-text: var(--primary-subtle);
-  --footer-link-hover: var(--primary);
-
-  /* ---- Social hover (optional override) ---- */
-  --social-instagram: #E4405F;
-  --social-youtube: #FF0000;
-  --social-twitter: #1DA1F2;
-  --social-linkedin: #0077B5;
+@theme {
+  --font-sans: Helvetica, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  
+  --color-primary: #FFD1F9;
+  --color-secondary: #184B4A;
+  --color-bg: #F5EDE4;
+  --color-accent: #2A6664;
+  --color-hover: #1A2B2A;
+  --color-text: #1A2B2A;
+  --color-text-muted: #5A6B6A;
+ 
 }
 
-/* Tailwind theme – maps tokens to utility classes (e.g. bg-primary, text-foreground) */
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-dark: var(--primary-dark);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-surface: var(--surface);
-  --color-surface-alt: var(--surface-alt);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-social-instagram: var(--social-instagram);
-  --color-social-youtube: var(--social-youtube);
-  --color-social-twitter: var(--social-twitter);
-  --color-social-linkedin: var(--social-linkedin);
-}
-
-/* ==========================================================================
-   Base styles
-   ========================================================================== */
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  margin: 0;
-  padding: 0;
+.hero-notebook-grid {
+  background-color: var(--color-bg);
+  background-image: 
+    linear-gradient(to right, rgba(42, 102, 100, 0.25) 0%, transparent 48px),
+    linear-gradient(to right, rgba(24, 75, 74, 0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(24, 75, 74, 0.14) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+  background-position: 0 0, 0 0, 0 0;
 }
